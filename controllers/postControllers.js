@@ -19,18 +19,55 @@ const index = (req, res) => {
     })
 }
 const show = (req, res) => {
-    const slug = req.params.slug
+    /*   const slug = req.params.slug
+  
+      const post = posts.find((post) => post.slug === slug)
+  
+      if (!post) {
+          return res.status(404).json({
+              message: '404! not found'
+          })
+      }
+  
+      res.status(200).json(post) */
 
-    const post = posts.find((post) => post.slug === slug)
+    const id = req.params.id
+    console.log(id);
 
-    if (!post) {
-        return res.status(404).json({
-            message: '404! not found'
+    const sql = 'SELECT * FROM posts WHERE id=?'
+
+    const tagsSql = `
+        SELECT tags.label
+        FROM tags
+        JOIN post_tag ON tags.id = post_tag.tag_id
+        WHERE post_tag.tag_id = ?
+    `
+    connection.query(sql, [id], (err, results) => {
+        if (err) return res.status(500).json({ error: err });
+
+        if (!results[0]) return res.status(404).json({ error: `404! Not found` })
+
+
+        const posts = results[0]
+        console.log('Post obj', posts);
+
+        connection.query(tagsSql, [id], (err, tagsResults) => {
+            if (err) return res.status(500).json({ error: err });
+            console.log('👉', tagsResults);
+
+            posts.tags = tagsResults;
+
+            const responseData = {
+                data: posts
+            }
+
+            console.log(responseData);
+            res.status(200).json(responseData);
         })
-    }
-
-    res.status(200).json(post)
+    })
 }
+
+
 const store = (req, res) => {
     console.log(req.body);
     const post = {
@@ -108,4 +145,3 @@ const destroy = (req, res) => {
 }
 module.exports = { show, index, store, update, destroy }
 
-//
