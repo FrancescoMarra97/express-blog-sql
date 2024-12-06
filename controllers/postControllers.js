@@ -2,7 +2,17 @@ const { title } = require('process')
 const posts = require('../db/db.js')
 const fs = require('fs')
 const { post } = require('../routes/posts.js')
+const connection = require('../db/connection.js')
 
+
+
+const index = (req, res) => {
+
+    res.json({
+        data: posts,
+        counter: posts.length
+    })
+}
 const show = (req, res) => {
     const slug = req.params.slug
 
@@ -16,27 +26,6 @@ const show = (req, res) => {
 
     res.status(200).json(post)
 }
-
-const index = (req, res) => {
-    /*    let html = '<ul>'
-       posts.forEach((post) => {
-           html += `
-           <li>
-               <h2>${post.title}</h2>
-               <img src="/imgs/posts/${post.image}" alt="${post.title}">
-               <p>${post.content}</p>           
-               ${post.tags.join(', ')}
-           </li>
-           `
-       })
-       html += '</ul>'
-       //res.send(html) */
-    res.json({
-        data: posts,
-        counter: posts.length
-    })
-}
-
 const store = (req, res) => {
     console.log(req.body);
     const post = {
